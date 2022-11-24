@@ -24,7 +24,7 @@ const int Width = 1024;
 const int Height = 768;
 
 const float spherePos[6][2] = { {-2.0f, 0} , {0.0f,0} , {2.0f,0}, {-2.3f, 1.0f}, {0.0f, 1.0f}, {2.3f, 1.0f} };
-// initialize the color of each ball (ball0 ~ ball3)
+// initialize the color of each ball
 const D3DXCOLOR sphereColor[6] = { d3d::YELLOW, d3d::YELLOW, d3d::YELLOW, d3d::YELLOW,d3d::YELLOW,d3d::YELLOW };
 
 // -----------------------------------------------------------------------------
@@ -122,43 +122,16 @@ public:
         {
             adjustPosition(ball);
             //공과 공이 부딪히는거 
-            /*
-            D3DXVECTOR3 ball_other = ball.getCenter();
-
-            double dx = center_x - ball_other.x;
-            double dz = center_z - ball_other.z;
-            double distance = sqrt((dx * dx) + (dz * dz));
-
-            double this_vx = this->m_velocity_x;
-            double this_vz = this->m_velocity_z;
-            double other_vx = ball.m_velocity_x;
-            double other_vz = ball.m_velocity_z;
-
-            double cos_t = dx / distance;
-            double sin_t = dz / distance;
-
-            double this_vxp = other_vx * cos_t + other_vz * sin_t;
-            double other_vxp = this_vx * cos_t + this_vz * sin_t;
-            double this_vzp = this_vz * cos_t - this_vx * sin_t;
-            double other_vzp = other_vz * cos_t - other_vx * sin_t;
-            this->setPower(this_vxp * cos_t - this_vzp * sin_t, this_vxp * sin_t + this_vzp * cos_t);
-            ball.setPower(other_vxp * cos_t - other_vzp * sin_t, other_vxp * sin_t + other_vzp * cos_t);
-            */
-
-
             float dx = ball.getCenter().x - this->getCenter().x;
             float dz = ball.getCenter().z - this->getCenter().z;
             float distance = sqrt(dx * dx + dz * dz);
-            //double cos_a = dx / distance;
-            //double sin_a = dz / distance;
-            //double tvx = this->m_velocity_x; //this velocity x
-            //double tvz = this->m_velocity_z;
-            float bvx = ball.m_velocity_x; // ball velocity x
+
+            float bvx = ball.m_velocity_x; 
             float bvz = ball.m_velocity_z;
+
             float velocity = sqrt(bvx * bvx + bvz * bvz);
             float dt = velocity / distance;
             ball.setPower(dx * dt, dz * dt);
-
 
             if (this->ball_color == 0)
             {
@@ -181,25 +154,9 @@ public:
         {
             float tX = cord.x + TIME_SCALE * timeDiff * m_velocity_x;
             float tZ = cord.z + TIME_SCALE * timeDiff * m_velocity_z;
-
-            //correction of position of ball
-            // Please uncomment this part because this correction of ball position is necessary when a ball collides with a wall
-            /*if(tX >= (4.5 - M_RADIUS))
-               tX = 4.5 - M_RADIUS;
-            else if(tX <=(-4.5 + M_RADIUS))
-               tX = -4.5 + M_RADIUS;
-            else if(tZ <= (-3 + M_RADIUS))
-               tZ = -3 + M_RADIUS;
-            else if(tZ >= (3 - M_RADIUS))
-               tZ = 3 - M_RADIUS;*/
              this->setCenter(tX, cord.y, tZ);
         }
         else { this->setPower(0, 0); }
-        /*this->setPower(this->getVelocity_X() * DECREASE_RATE, this->getVelocity_Z() * DECREASE_RATE);
-        double rate = 1 -  (1 - DECREASE_RATE)*timeDiff * 400;
-        if(rate < 0 )
-           rate = 0;
-        this->setPower(getVelocity_X() * rate, getVelocity_Z() * rate);*/
     }
 
     double getVelocity_X() { return this->m_velocity_x; }
@@ -238,7 +195,7 @@ public:
         else
             this->ball_color = 2;
     }
-    void CSphere::adjustPosition(CSphere& ball) {
+    void adjustPosition(CSphere& ball) {
         D3DXVECTOR3 ball_cord = ball.getCenter();
 
         this->setCenter((center_x + this->pre_center_x) / 2, center_y, (center_z + this->pre_center_z) / 2);
@@ -337,13 +294,6 @@ public:
                 return true;
             }
         }
-        /*else if (this->wall_position == 1)
-        {
-            if (ball.getCenter().z - ball.getRadius() < this->m_z + (this->m_depth / 2))
-            {
-                return true;
-            }
-        }*/
         else if (this->wall_position == 2)
         {
             if (ball.getCenter().x + ball.getRadius() > this->m_x - (this->m_width / 2))
@@ -374,7 +324,6 @@ public:
             }
             else if (this->wall_position == 1) //아래
             {
-                //공 원위치 시키고 스페이스바 누르면 시작하는 단계로 돌아가기
                 return;
             }
             else if (this->wall_position == 2) //오른쪽
@@ -554,11 +503,6 @@ bool Setup()
         g_legowall[0].setPosition(0.0f, 0.12f, 4.5f);
         g_legowall[0].set_wallPosition(0);
     }
-    //if (false == g_legowall[1].create(Device, -1, -1, 6.6f, 0.3f, 0.12f, d3d::DARKRED)) return false; // 현재 가로 기준 아래
-    //{
-       //g_legowall[1].setPosition(0.0f, 0.12f, -4.5f);
-       //g_legowall[1].set_wallPosition(1);
-    //}
     if (false == g_legowall[1].create(Device, -1, -1, 0.12f, 0.3f, 9, d3d::DARKRED)) return false; // 현재 가로 기준 오른쪽
     {
         g_legowall[1].setPosition(3.24f, 0.12f, 0.0f);
@@ -580,7 +524,6 @@ bool Setup()
 
     // create white mouse ball for set direction
     if (false == g_target_whiteball.create(Device, d3d::WHITE)) return false;
-    //g_target_whiteball.setCenter(.0f, (float)M_RADIUS , .0f);
     g_target_whiteball.setCenter(0.0f, 0.12f, -4.5f);
     g_target_whiteball.setColor(d3d::WHITE);
 
@@ -636,7 +579,7 @@ void Cleanup(void)
 }
 
 
-// timeDelta represents the time between the current image frame and the last image frame.+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// timeDelta represents the time between the current image frame and the last image frame.
 // the distance of moving balls should be "velocity * timeDelta"
 bool Display(float timeDelta)
 {
@@ -653,14 +596,11 @@ bool Display(float timeDelta)
 
             // check whether any two balls hit together and update the direction of balls
             for (i = 0; i < ball_num; i++) {
-                //red_ball.hitBy(g_sphere[i]);
                 g_sphere[i].hitBy(red_ball);
             }
 
             // update the position of each ball. during update, check whether each ball hit by walls.
             for (i = 0; i < ball_num; i++) {
-                /*if (g_sphere[i].ball_existance() == false)
-                   continue;*/
                 g_sphere[i].ballUpdate(timeDelta);
             }
 
@@ -668,13 +608,8 @@ bool Display(float timeDelta)
                 g_legowall[i].hitBy(red_ball);
             }
 
-            //red_ball.ballUpdate(timeDelta);
-
-
-            //red_ball.hitBy(g_target_whiteball);
             g_target_whiteball.hitBy(red_ball);
             g_target_whiteball.ballUpdate(timeDelta);
-            //g_target_whiteball.ballUpdate(timeDelta);
 
             if (red_ball.getCenter().z < -5.0f)
             {
@@ -687,7 +622,6 @@ bool Display(float timeDelta)
             }
 
             red_ball.ballUpdate(timeDelta);
-
 
             // draw plane, walls, and spheres
             g_legoPlane.draw(Device, g_mWorld);
@@ -775,16 +709,7 @@ LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (!startflag)
                 red_ball.setPower(0, 2);
             startflag = true;
-            /*
-            D3DXVECTOR3 targetpos = g_target_whiteball.getCenter();
-            D3DXVECTOR3   whitepos = g_sphere[3].getCenter();
-            double theta = acos(sqrt(pow(targetpos.x - whitepos.x, 2)) / sqrt(pow(targetpos.x - whitepos.x, 2) +
-               pow(targetpos.z - whitepos.z, 2)));      // 기본 1 사분면
-            if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x >= 0) { theta = -theta; }   //4 사분면
-            if (targetpos.z - whitepos.z >= 0 && targetpos.x - whitepos.x <= 0) { theta = PI - theta; } //2 사분면
-            if (targetpos.z - whitepos.z <= 0 && targetpos.x - whitepos.x <= 0){ theta = PI + theta; } // 3 사분면
-            double distance = sqrt(pow(targetpos.x - whitepos.x, 2) + pow(targetpos.z - whitepos.z, 2));
-            //g_sphere[3].setPower(distance * cos(theta), distance * sin(theta));*/
+
             break;
 
         }
@@ -831,7 +756,6 @@ LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             if (LOWORD(wParam) & MK_RBUTTON) {
                 dx = (old_x - new_x);// * 0.01f;
-                //dy = (old_y - new_y);// * 0.01f;
 
                 D3DXVECTOR3 coord3d = g_target_whiteball.getCenter();
                 g_target_whiteball.setCenter(coord3d.x + dx * (-0.007f), coord3d.y, -4.5f);
