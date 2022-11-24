@@ -356,7 +356,7 @@ public:
 
     float getHeight(void) const { return M_HEIGHT; }
 
-    void CWall::adjustPosition(CSphere& ball) {
+    void adjustPosition(CSphere& ball) {
         ball.setCenter((ball.getCenter().x + ball.getPreCenter_x()) / 2, ball.getCenter().y, (ball.getCenter().z + ball.getPreCenter_z()) / 2);
         if (this->hasIntersected(ball))
         {
