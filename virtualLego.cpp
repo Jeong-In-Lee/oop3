@@ -206,11 +206,11 @@ public:
             ball.setCenter(ball.pre_center_x, ball_cord.y, ball.pre_center_z);
         }
     }
-    double CSphere::getPreCenter_x() const {
+    double getPreCenter_x() const {
         return this->pre_center_x;
     }
 
-    double CSphere::getPreCenter_z() const {
+    double getPreCenter_z() const {
         return this->pre_center_z;
     }
 
